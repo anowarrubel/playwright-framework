@@ -1,0 +1,126 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    # Nightly QA-env regression at 02:00 UTC.
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'qa'
+        type: choice
+        options: [dev, qa, prod]
+      site:
+        description: 'Site to run (leave blank for all)'
+        required: false
+        default: ''
+        type: choice
+        options: ['', 'demoqa', 'academybugs', 'saucedemo']
+      suite:
+        description: 'Suite to run'
+        required: true
+        default: 'all'
+        type: choice
+        options: [all, functional, accessibility]
+
+concurrency:
+  group: playwright-${{ github.ref }}-${{ inputs.environment || 'qa' }}-${{ inputs.site || 'all' }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: ${{ matrix.project }} • ${{ inputs.environment || 'qa' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium, firefox, webkit]
+
+    env:
+      TEST_ENV: ${{ inputs.environment || 'qa' }}
+      SITE: ${{ inputs.site || '' }}
+      SUITE: ${{ inputs.suite || 'all' }}
+      PROJECT: ${{ matrix.project }}
+      SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME || 'standard_user' }}
+      SAUCE_PASSWORD: ${{ secrets.SAUCE_PASSWORD || 'secret_sauce' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps "$PROJECT"
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run Playwright tests
+        run: |
+          case "$SUITE" in
+            functional)    DIR="tests/functional" ;;
+            accessibility) DIR="tests/accessibility" ;;
+            *)             DIR="" ;;
+          esac
+          npx playwright test $DIR --project="$PROJECT"
+
+      - name: Upload Playwright HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.project }}-${{ inputs.environment || 'qa' }}
+          path: playwright-report
+          retention-days: 14
+
+      - name: Upload test-results (traces, videos, axe JSON)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.project }}-${{ inputs.environment || 'qa' }}
+          path: test-results
+          retention-days: 7
+
+  summary:
+    name: Aggregate summary
+    needs: test
+    if: always()
+    runs-on: ubuntu-latest
+    env:
+      TEST_ENV: ${{ inputs.environment || 'qa' }}
+      SITE: ${{ inputs.site || 'all' }}
+      SUITE: ${{ inputs.suite || 'all' }}
+      TRIGGER: ${{ github.event_name }}
+    steps:
+      - name: Write run summary
+        run: |
+          {
+            echo "## Playwright run summary"
+            echo ""
+            echo "| Setting | Value |"
+            echo "|---|---|"
+            echo "| Environment | \`$TEST_ENV\` |"
+            echo "| Site | \`$SITE\` |"
+            echo "| Suite | \`$SUITE\` |"
+            echo "| Trigger | \`$TRIGGER\` |"
+            echo ""
+            echo "Download HTML reports from the **Artifacts** section of this run."
+          } >> "$GITHUB_STEP_SUMMARY"

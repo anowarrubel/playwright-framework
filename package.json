@@ -1,0 +1,44 @@
+{
+  "name": "playwright-multi-site-framework",
+  "version": "1.0.0",
+  "description": "Playwright + TypeScript test framework supporting multiple sites, multiple environments, accessibility scans, and GitHub Actions CI.",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "cross-env PWDEBUG=1 playwright test",
+
+    "test:dev": "cross-env TEST_ENV=dev playwright test",
+    "test:qa": "cross-env TEST_ENV=qa playwright test",
+    "test:prod": "cross-env TEST_ENV=prod playwright test",
+
+    "test:demoqa": "cross-env SITE=demoqa playwright test",
+    "test:academybugs": "cross-env SITE=academybugs playwright test",
+    "test:saucedemo": "cross-env SITE=saucedemo playwright test",
+
+    "test:a11y": "playwright test tests/accessibility",
+    "test:functional": "playwright test tests/functional",
+
+    "report": "playwright show-report",
+    "install:browsers": "playwright install --with-deps",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.9.1",
+    "@eslint/js": "^9.14.0",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^20.12.7",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.5",
+    "eslint": "^9.14.0",
+    "eslint-plugin-playwright": "^2.0.1",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^8.13.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
