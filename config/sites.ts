@@ -131,6 +131,7 @@ export const sites: Record<SiteId, SiteConfig> = {
     },
     responsiveKnownIssues: {
       'mobile:no-horizontal-scroll': 'Home page is 388px wide on a 375px phone screen (13px overflow)',
+      'mobile:media-fits': 'An SVG (WB-u-E_TRWX.svg) is wider than a 375px phone in WebKit on Linux (CI)',
     },
     // Tag Manager announces itself with a 'gtm.js' event once it has loaded.
     analytics: { vendors: ['gtm', 'ua'], dataLayerEvents: ['gtm.js'] },
