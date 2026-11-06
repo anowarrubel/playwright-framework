@@ -50,11 +50,10 @@ export async function collectSeoSnapshot(
   // Single-page apps often answer every path with their HTML shell and a 200.
   const robotsTxtValid = /^\s*(user-agent|disallow|allow|sitemap):/im.test(robotsBody);
 
-  let hasSitemap = /^\s*sitemap:/im.test(robotsBody);
-  if (!hasSitemap) {
-    const sitemap = await request.get(`${origin}/sitemap.xml`, { failOnStatusCode: false });
-    hasSitemap = sitemap.ok() && /<(urlset|sitemapindex)\b/.test(await sitemap.text());
-  }
+  // robots.txt may point at the sitemap; otherwise try the usual spot.
+  const declared = /^\s*sitemap:\s*(\S+)/im.exec(robotsBody)?.[1];
+  const sitemap = await request.get(declared ?? `${origin}/sitemap.xml`, { failOnStatusCode: false });
+  const hasSitemap = sitemap.ok() && /<(urlset|sitemapindex)\b/.test(await sitemap.text());
 
   return { url: page.url(), ...dom, robotsTxtStatus: robots.status(), robotsTxtValid, hasSitemap };
 }

@@ -56,6 +56,8 @@ export async function checkA11y(
 
   const results = await builder.analyze();
 
+  expect(results.passes.length + results.violations.length, 'axe evaluated some rules').toBeGreaterThan(0);
+
   await testInfo.attach('axe-results.json', {
     body: JSON.stringify(results, null, 2),
     contentType: 'application/json',

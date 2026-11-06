@@ -21,7 +21,7 @@ for (const siteId of Object.keys(sites) as SiteId[]) {
         await expect(page).toHaveScreenshot(`${siteId}-${visual.name}.png`, {
           fullPage: true,
           animations: 'disabled',
-          maxDiffPixelRatio: 0.02,
+          maxDiffPixelRatio: visual.tolerance ?? 0.002,
           mask: (visual.mask ?? []).map((selector) => page.locator(selector)),
         });
       });

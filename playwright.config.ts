@@ -13,7 +13,7 @@ const siteFilter = getSiteFilter();
 const isCI = !!process.env.CI;
 
 // These suites run on chromium only.
-const CHROMIUM_ONLY = ['**/security/**', '**/api/**', '**/performance/**', '**/visual/**'];
+const CHROMIUM_ONLY = ['**/security/**', '**/api/**', '**/performance/**', '**/visual/**', '**/config/**'];
 
 // Visual baselines are per OS, so CI only runs them when RUN_VISUAL=1.
 const ciSkips = isCI && !process.env.RUN_VISUAL ? ['**/visual/**'] : [];
@@ -35,8 +35,8 @@ export default defineConfig({
   expect: { timeout: 10_000 },
   reporter,
 
-  // SITE=<id> runs only that site's tests; describe blocks are tagged '@<id>'.
-  grep: siteFilter ? new RegExp(`@${siteFilter}\\b`) : undefined,
+  // SITE=<id>[,<id>] runs only those sites' tests; describe blocks are tagged '@<id>'.
+  grep: siteFilter.length ? new RegExp(`@(${siteFilter.join('|')})\\b`) : undefined,
 
   use: {
     actionTimeout: 15_000,

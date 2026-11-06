@@ -27,7 +27,7 @@ on:
         required: true
         default: 'all'
         type: choice
-        options: [all, functional, accessibility, security, seo, analytics, performance, responsive, api, visual, i18n]
+        options: [all, config, functional, accessibility, security, seo, analytics, performance, responsive, api, visual, i18n]
       update_snapshots:
         description: 'Visual suite: regenerate baselines instead of comparing (download them from the artifacts and commit)'
         required: false

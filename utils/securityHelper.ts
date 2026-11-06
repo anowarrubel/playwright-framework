@@ -47,15 +47,16 @@ export async function gatherSecurityContext(
     headers,
     setCookies,
     httpRedirectsToHttps,
-    tls: isHttps ? await checkTlsCertificate(url.hostname) : null,
+    tls: isHttps ? await checkTlsCertificate(url.hostname, Number(url.port) || 443) : null,
   };
 }
 
 function checkTlsCertificate(
   hostname: string,
+  port: number,
 ): Promise<{ daysUntilExpiry: number } | { error: string }> {
   return new Promise((resolve) => {
-    const socket = tls.connect({ host: hostname, port: 443, servername: hostname, timeout: 10_000 }, () => {
+    const socket = tls.connect({ host: hostname, port, servername: hostname, timeout: 10_000 }, () => {
       const cert = socket.getPeerCertificate();
       socket.end();
       if (!cert?.valid_to) {

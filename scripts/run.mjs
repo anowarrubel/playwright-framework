@@ -25,6 +25,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 dotenv.config({ path: join(root, '.env'), quiet: true });
 
 const SUITES = {
+  config: 'tests/config',
   functional: 'tests/functional',
   accessibility: 'tests/accessibility',
   security: 'tests/security',
@@ -92,10 +93,10 @@ for (const arg of [...fromNpm, ...ownArgs]) {
   for (const raw of arg.split(':').filter(Boolean)) {
     const word = ALIASES[raw] ?? raw;
     if (word === 'all') continue;
-    if (SITES.includes(word)) flags.site = word;
+    if (SITES.includes(word)) flags.site = flags.site ? `${flags.site},${word}` : word;
     else if (ENVS.includes(word)) flags.env = word;
     else if (BROWSERS.includes(word)) flags.browser = word;
-    else if (word in SUITES) flags.suite = flags.suite ? `${flags.suite},${word}` : word;
+    else if (Object.hasOwn(SUITES, word)) flags.suite = flags.suite ? `${flags.suite},${word}` : word;
     else fail(`Don't know "${raw}". Sites: ${SITES.join(', ')} | envs: ${ENVS.join(', ')} | browsers: ${BROWSERS.join(', ')} | suites: ${Object.keys(SUITES).join(', ')}`);
   }
 }
@@ -129,11 +130,12 @@ if (interactive) {
 
 suite = (suite || 'all').split(',').map((s) => ALIASES[s.trim()] ?? s.trim());
 site = site || 'all';
+if (site.split(',').includes('all')) site = 'all';
 env = env || process.env.TEST_ENV || 'qa';
 browser = browser || 'chromium';
 
 check('suite', suite, Object.keys(SUITES), ['all']);
-check('site', [site], SITES, ['all']);
+check('site', site.split(','), SITES, ['all']);
 check('env', [env], ENVS);
 check('browser', [browser], BROWSERS, ['all']);
 

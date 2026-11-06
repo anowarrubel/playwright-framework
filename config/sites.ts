@@ -56,6 +56,8 @@ export interface VisualPage {
   /** Selectors to blank out before comparing (dates, ads, anything that changes). */
   mask?: string[];
   viewport?: { width: number; height: number };
+  /** Share of pixels allowed to differ, 0-1. Default 0.002. */
+  tolerance?: number;
 }
 
 export interface SiteConfig {
@@ -260,18 +262,17 @@ export function getSite(id: SiteId): SiteConfig {
  * config, so real hosts can be supplied without touching code.
  */
 export function getBaseUrl(id: SiteId, env: TestEnv): string {
-  const override = process.env[`${id}_${env}_URL`.toUpperCase()]?.trim();
+  const override = process.env[`${id}_${env}_URL`.toUpperCase().replace(/[^A-Z0-9]/g, '_')]?.trim();
   return override || getSite(id).baseUrls[env];
 }
 
-/** Returns the SITE env filter (or null to mean "run all"). */
-export function getSiteFilter(): SiteId | null {
-  const raw = process.env.SITE?.trim().toLowerCase();
-  if (!raw) return null;
-  if (!(raw in sites)) {
-    throw new Error(
-      `SITE="${raw}" is not registered. Add it to config/sites.ts or remove the variable.`,
-    );
+/** The SITE filter: one id or a comma-separated list. Empty means "run all". */
+export function getSiteFilter(): SiteId[] {
+  const wanted = (process.env.SITE ?? '').toLowerCase().split(',').map((s) => s.trim()).filter(Boolean);
+  for (const id of wanted) {
+    if (!Object.prototype.hasOwnProperty.call(sites, id)) {
+      throw new Error(`SITE="${id}" is not registered. Add it to config/sites.ts or remove the variable.`);
+    }
   }
-  return raw as SiteId;
+  return wanted as SiteId[];
 }
