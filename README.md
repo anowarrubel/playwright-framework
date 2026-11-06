@@ -1,5 +1,7 @@
 # Playwright Multi-Site Test Framework
 
+[![Playwright Tests](https://github.com/anowarrubel/playwright-framework/actions/workflows/playwright.yml/badge.svg)](https://github.com/anowarrubel/playwright-framework/actions/workflows/playwright.yml)
+
 Playwright + TypeScript suite that runs the same checks against several sites
 and environments. Functional, accessibility, security, SEO, analytics,
 performance, responsive, API, visual and i18n checks run against three public
