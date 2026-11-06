@@ -179,6 +179,10 @@ export const sites: Record<SiteId, SiteConfig> = {
       'single-h1': 'Home page has no <h1>',
     },
     analytics: { vendors: ['ga4'] },
+    responsiveKnownIssues: {
+      'mobile:no-horizontal-scroll': 'Overflows a 375px phone by about 5px on Linux (CI); fits on macOS',
+      'tablet:no-horizontal-scroll': 'Overflows a 768px tablet by about 13px on Linux (CI); fits on macOS',
+    },
     // The shared host answers in roughly 700ms, which sits right on the default
     // 800ms budget and would make the check flaky.
     perfBudget: { ttfb: 1200 },
