@@ -149,6 +149,11 @@ suite dropdowns. Each run type-checks, lints, then runs a matrix of chromium,
 firefox and webkit, and uploads the HTML report as `playwright-report-<browser>-<env>`.
 Suites that are chromium-only simply have nothing to run in the other jobs.
 
+CI runs inside the official Playwright container image (`mcr.microsoft.com/playwright`),
+so browsers and system packages are already there. When `@playwright/test` is upgraded
+in `package-lock.json`, update the image tag and `IMAGE_PLAYWRIGHT_VERSION` in the
+workflow to match; a check step fails with a clear message if they drift.
+
 Optional secrets: `SAUCE_USERNAME` and `SAUCE_PASSWORD` (the public demo values
 are the default).
 
