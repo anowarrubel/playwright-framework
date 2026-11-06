@@ -26,6 +26,7 @@ dotenv.config({ path: join(root, '.env'), quiet: true });
 
 const SUITES = {
   config: 'tests/config',
+  links: 'tests/links',
   functional: 'tests/functional',
   accessibility: 'tests/accessibility',
   security: 'tests/security',

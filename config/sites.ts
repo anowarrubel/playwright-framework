@@ -90,6 +90,8 @@ export interface SiteConfig {
   responsiveKnownIssues?: Record<string, string>;
   /** Check id (see utils/i18nHelper.ts) -> why. */
   i18nKnownIssues?: Record<string, string>;
+  /** 'broken-link:<path>' or 'links-found' -> why. See tests/links. */
+  linkKnownIssues?: Record<string, string>;
   /** Omit to skip API tests for this site. */
   api?: ApiConfig;
   /** Omit to skip visual-regression tests for this site. Pick stable pages only. */
@@ -181,6 +183,9 @@ export const sites: Record<SiteId, SiteConfig> = {
       'meta-description': 'No <meta name="description"> on the home page',
       'single-h1': 'Home page has no <h1>',
     },
+    linkKnownIssues: {
+      'broken-link:/academy-team/': 'Linked from the home page but returns 404',
+    },
     analytics: { vendors: ['ga4'] },
     responsiveKnownIssues: {
       'mobile:no-horizontal-scroll': 'Overflows a 375px phone by about 5px on Linux (CI); fits on macOS',
@@ -235,6 +240,9 @@ export const sites: Record<SiteId, SiteConfig> = {
       'single-h1': 'Home page has no <h1>',
       indexable: 'Deliberately noindex: it is a practice app, not meant to be searchable',
       sitemap: 'Demo app publishes no sitemap',
+    },
+    linkKnownIssues: {
+      'links-found': 'The login page has no links',
     },
     // An empty vendor list asserts the site loads no analytics or tracking.
     analytics: { vendors: [] },

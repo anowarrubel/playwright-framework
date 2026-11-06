@@ -27,7 +27,7 @@ on:
         required: true
         default: 'all'
         type: choice
-        options: [all, config, functional, accessibility, security, seo, analytics, performance, responsive, api, visual, i18n]
+        options: [all, config, functional, accessibility, security, seo, analytics, performance, responsive, api, visual, i18n, links]
       update_snapshots:
         description: 'Visual suite: regenerate baselines instead of comparing (download them from the artifacts and commit)'
         required: false
@@ -110,6 +110,8 @@ jobs:
             api)           DIR="tests/api" ;;
             visual)        DIR="tests/visual" ;;
             i18n)          DIR="tests/i18n" ;;
+            links)         DIR="tests/links" ;;
+            config)        DIR="tests/config" ;;
             *)             DIR="" ;;
           esac
           EXTRA=""
@@ -117,12 +119,18 @@ jobs:
           # Chromium-only suites leave nothing to run in the other browser jobs.
           npx playwright test $DIR --project="$PROJECT" $EXTRA --pass-with-no-tests
 
+      - name: Summarise findings
+        if: always()
+        run: npm run summary
+
       - name: Upload Playwright HTML report
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: playwright-report-${{ matrix.project }}-${{ inputs.environment || 'qa' }}
-          path: playwright-report
+          path: |
+            playwright-report
+            reports
           retention-days: 14
 
       - name: Upload visual baselines

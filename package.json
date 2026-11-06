@@ -27,6 +27,7 @@
     "test:i18n": "playwright test tests/i18n",
     "report": "playwright show-report",
     "install:browsers": "playwright install --with-deps",
+    "summary": "node scripts/summary.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"

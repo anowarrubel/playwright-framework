@@ -4,7 +4,7 @@
 
 Playwright + TypeScript suite that runs the same checks against several sites
 and environments. Functional, accessibility, security, SEO, analytics,
-performance, responsive, API, visual and i18n checks run against three public
+performance, responsive, API, visual, i18n and broken-link checks run against three public
 demo sites (DemoQA, Academy Bugs, Sauce Demo), and GitHub Actions can run any
 combination on demand.
 
@@ -34,7 +34,7 @@ npm run t                                 # menu (terminal only, never in CI)
 ```
 
 Suites: `functional`, `accessibility` (`a11y`), `security`, `seo`, `analytics`,
-`performance` (`perf`), `responsive`, `api`, `visual`, `i18n`.
+`performance` (`perf`), `responsive`, `api`, `visual`, `i18n`, `links`, `config`.
 Flags: `--suite --site --env --browser`, `--headed --ui --debug`, `--update`
 (visual baselines), `--yes` (skip the menu). Anything after a second `--` goes
 straight to Playwright.
@@ -59,8 +59,10 @@ suite, API included.
 | Performance | TTFB, FCP, LCP, CLS, request count against budgets (median of 3 loads) | chromium |
 | Responsive | at 375px and 768px: viewport meta, no sideways scroll, media fits, readable text | chromium, webkit |
 | API | status, JSON, response time and shape for each listed endpoint | chromium |
-| Visual | screenshot of each listed page against a baseline (2% pixel tolerance) | chromium |
+| Visual | screenshot of each listed page against a baseline (0.2% pixel tolerance) | chromium |
 | i18n | valid lang, UTF-8, hreflang, no garbled text, loads under de/ja/ar locales | all |
+| Links | first 30 same-site links on the home page answer without a 4xx or 5xx | chromium |
+| Config | every known-issue key names a real check and has a reason | chromium |
 
 Everything is driven from `config/sites.ts`: each site can define `analytics`,
 `api`, `visual`, `perfBudget` and the known-issue lists below.
@@ -69,7 +71,7 @@ Everything is driven from `config/sites.ts`: each site can define `analytics`,
 
 Each check family has a per-site list (`a11yKnownIssues`, `securityKnownIssues`,
 `seoKnownIssues`, `perfKnownIssues`, `responsiveKnownIssues`,
-`i18nKnownIssues`) mapping a check id to a one-line reason. A listed check that
+`i18nKnownIssues`, `linkKnownIssues`) mapping a check id to a one-line reason. A listed check that
 fails does not fail the build; it shows as a `known-issue` annotation in the
 report. If it starts passing the report says `known-issue-fixed`, and the entry
 can be deleted. A failing check that isn't listed fails the build.
@@ -118,7 +120,7 @@ fixtures/     custom fixtures (page objects, a11y, analytics)
 utils/        helpers behind each suite (axe, security, seo, perf, ...)
 tests/        functional, accessibility, security, seo, analytics,
               performance, responsive, api, visual, i18n
-scripts/      run.mjs, the `npm run t` launcher
+scripts/      run.mjs (the `npm run t` launcher), summary.mjs (CI findings table)
 ```
 
 ## Adding a site
