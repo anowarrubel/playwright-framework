@@ -74,7 +74,14 @@ jobs:
         run: npm ci
 
       - name: Install Playwright browser
-        run: npx playwright install --with-deps "$PROJECT"
+        # The browser download occasionally hangs, so cap each attempt and retry.
+        run: |
+          for attempt in 1 2 3; do
+            timeout 300 npx playwright install --with-deps "$PROJECT" && exit 0
+            echo "Browser install attempt $attempt failed" >&2
+            sleep 10
+          done
+          exit 1
 
       - name: Type-check
         run: npm run typecheck
