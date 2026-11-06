@@ -27,10 +27,15 @@ on:
         required: true
         default: 'all'
         type: choice
-        options: [all, functional, accessibility]
+        options: [all, functional, accessibility, security, seo, analytics, performance, responsive, api, visual, i18n]
+      update_snapshots:
+        description: 'Visual suite: regenerate baselines instead of comparing (download them from the artifacts and commit)'
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
-  group: playwright-${{ github.ref }}-${{ inputs.environment || 'qa' }}-${{ inputs.site || 'all' }}
+  group: playwright-${{ github.ref }}-${{ github.event_name }}-${{ inputs.environment || 'qa' }}-${{ inputs.site || 'all' }}
   cancel-in-progress: true
 
 jobs:
@@ -48,6 +53,9 @@ jobs:
       TEST_ENV: ${{ inputs.environment || 'qa' }}
       SITE: ${{ inputs.site || '' }}
       SUITE: ${{ inputs.suite || 'all' }}
+      UPDATE_SNAPSHOTS: ${{ inputs.update_snapshots && 'true' || 'false' }}
+      # Visual baselines are per OS: only compare once Linux ones are committed.
+      RUN_VISUAL: ${{ inputs.suite == 'visual' && '1' || '' }}
       PROJECT: ${{ matrix.project }}
       SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME || 'standard_user' }}
       SAUCE_PASSWORD: ${{ secrets.SAUCE_PASSWORD || 'secret_sauce' }}
@@ -79,9 +87,20 @@ jobs:
           case "$SUITE" in
             functional)    DIR="tests/functional" ;;
             accessibility) DIR="tests/accessibility" ;;
+            security)      DIR="tests/security" ;;
+            seo)           DIR="tests/seo" ;;
+            analytics)     DIR="tests/analytics" ;;
+            performance)   DIR="tests/performance" ;;
+            responsive)    DIR="tests/responsive" ;;
+            api)           DIR="tests/api" ;;
+            visual)        DIR="tests/visual" ;;
+            i18n)          DIR="tests/i18n" ;;
             *)             DIR="" ;;
           esac
-          npx playwright test $DIR --project="$PROJECT"
+          EXTRA=""
+          if [ "$UPDATE_SNAPSHOTS" = "true" ]; then EXTRA="--update-snapshots"; fi
+          # Chromium-only suites leave nothing to run in the other browser jobs.
+          npx playwright test $DIR --project="$PROJECT" $EXTRA --pass-with-no-tests
 
       - name: Upload Playwright HTML report
         if: always()
@@ -90,6 +109,14 @@ jobs:
           name: playwright-report-${{ matrix.project }}-${{ inputs.environment || 'qa' }}
           path: playwright-report
           retention-days: 14
+
+      - name: Upload visual baselines
+        if: inputs.update_snapshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-baselines-${{ matrix.project }}
+          path: tests/visual/**/*-snapshots
+          retention-days: 7
 
       - name: Upload test-results (traces, videos, axe JSON)
         if: failure()

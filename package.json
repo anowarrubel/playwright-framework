@@ -1,25 +1,30 @@
 {
   "name": "playwright-multi-site-framework",
   "version": "1.0.0",
-  "description": "Playwright + TypeScript test framework supporting multiple sites, multiple environments, accessibility scans, and GitHub Actions CI.",
+  "description": "Multi-site Playwright and TypeScript test suite: functional, accessibility, security, SEO, analytics, performance, API, visual and i18n checks.",
   "private": true,
   "scripts": {
     "test": "playwright test",
+    "t": "node scripts/run.mjs",
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
     "test:debug": "cross-env PWDEBUG=1 playwright test",
-
     "test:dev": "cross-env TEST_ENV=dev playwright test",
     "test:qa": "cross-env TEST_ENV=qa playwright test",
     "test:prod": "cross-env TEST_ENV=prod playwright test",
-
     "test:demoqa": "cross-env SITE=demoqa playwright test",
     "test:academybugs": "cross-env SITE=academybugs playwright test",
     "test:saucedemo": "cross-env SITE=saucedemo playwright test",
-
     "test:a11y": "playwright test tests/accessibility",
     "test:functional": "playwright test tests/functional",
-
+    "test:security": "playwright test tests/security",
+    "test:seo": "playwright test tests/seo",
+    "test:analytics": "playwright test tests/analytics",
+    "test:performance": "playwright test tests/performance",
+    "test:responsive": "playwright test tests/responsive",
+    "test:api": "playwright test tests/api",
+    "test:visual": "playwright test tests/visual",
+    "test:i18n": "playwright test tests/i18n",
     "report": "playwright show-report",
     "install:browsers": "playwright install --with-deps",
     "typecheck": "tsc --noEmit",

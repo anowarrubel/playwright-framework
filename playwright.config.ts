@@ -12,6 +12,12 @@ const TEST_ENV = getCurrentEnv();
 const siteFilter = getSiteFilter();
 const isCI = !!process.env.CI;
 
+// These suites run on chromium only.
+const CHROMIUM_ONLY = ['**/security/**', '**/api/**', '**/performance/**', '**/visual/**'];
+
+// Visual baselines are per OS, so CI only runs them when RUN_VISUAL=1.
+const ciSkips = isCI && !process.env.RUN_VISUAL ? ['**/visual/**'] : [];
+
 const reporter: ReporterDescription[] = [
   ['list'],
   ['html', { open: 'never', outputFolder: 'playwright-report' }],
@@ -29,8 +35,7 @@ export default defineConfig({
   expect: { timeout: 10_000 },
   reporter,
 
-  // SITE=<id> narrows the run to that site's tests. Every describe block is
-  // tagged with its site id (e.g. '@saucedemo'), so no per-spec skip logic.
+  // SITE=<id> runs only that site's tests; describe blocks are tagged '@<id>'.
   grep: siteFilter ? new RegExp(`@${siteFilter}\\b`) : undefined,
 
   use: {
@@ -48,14 +53,18 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      testIgnore: ciSkips,
     },
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
+      // Responsive runs on the Chrome and Safari engines only.
+      testIgnore: [...CHROMIUM_ONLY, '**/responsive/**'],
     },
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
+      testIgnore: CHROMIUM_ONLY,
     },
   ],
 });

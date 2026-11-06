@@ -4,6 +4,7 @@ import { AcademyBugsHomePage } from '../pages/academybugs/HomePage';
 import { SauceLoginPage } from '../pages/saucedemo/LoginPage';
 import { SauceInventoryPage } from '../pages/saucedemo/InventoryPage';
 import { checkA11y, A11yScanOptions } from '../utils/a11yHelper';
+import { AnalyticsTracker } from '../utils/analyticsHelper';
 import { getCurrentEnv, TestEnv } from '../config/env';
 
 /**
@@ -24,6 +25,7 @@ type Pages = {
 
 type Helpers = {
   a11y: (options?: A11yScanOptions) => Promise<void>;
+  analytics: AnalyticsTracker;
   env: TestEnv;
 };
 
@@ -45,6 +47,11 @@ export const test = base.extend<Pages & Helpers>({
     await use(async (options?: A11yScanOptions) => {
       await checkA11y(page, testInfo, options);
     });
+  },
+
+  // Request this fixture before page.goto() so early requests are captured.
+  analytics: async ({ page }, use) => {
+    await use(new AnalyticsTracker(page));
   },
 
   // Playwright requires a destructured first argument, even when empty.

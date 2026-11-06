@@ -2,14 +2,7 @@ import { test } from '../../fixtures/test-fixtures';
 import { getBaseUrl, sites, SiteId } from '../../config/sites';
 import { getCurrentEnv } from '../../config/env';
 
-/**
- * Runs a WCAG 2.1 AA axe scan on the home page of every registered site.
- * Serious and critical violations fail the test; lesser findings and any
- * rule listed in a site's `a11yKnownIssues` are reported but don't fail it.
- *
- * The full axe report is attached to each test as axe-results.json.
- * Each describe block is tagged with its site id so SITE=<id> can filter it.
- */
+/** axe-core WCAG 2.1 AA scan of each home page; serious and critical violations fail. */
 const env = getCurrentEnv();
 
 for (const siteId of Object.keys(sites) as SiteId[]) {
