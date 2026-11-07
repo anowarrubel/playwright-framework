@@ -60,8 +60,6 @@ jobs:
       SITE: ${{ inputs.site || '' }}
       SUITE: ${{ inputs.suite || 'all' }}
       UPDATE_SNAPSHOTS: ${{ inputs.update_snapshots && 'true' || 'false' }}
-      # Visual baselines are per OS: only compare once Linux ones are committed.
-      RUN_VISUAL: ${{ inputs.suite == 'visual' && '1' || '' }}
       PROJECT: ${{ matrix.project }}
       # Firefox refuses to start in the container unless HOME is owned by the current user.
       HOME: /root

@@ -15,9 +15,6 @@ const isCI = !!process.env.CI;
 // These suites run on chromium only.
 const CHROMIUM_ONLY = ['**/security/**', '**/api/**', '**/performance/**', '**/visual/**', '**/config/**', '**/links/**'];
 
-// Visual baselines are per OS, so CI only runs them when RUN_VISUAL=1.
-const ciSkips = isCI && !process.env.RUN_VISUAL ? ['**/visual/**'] : [];
-
 const reporter: ReporterDescription[] = [
   ['list'],
   ['html', { open: 'never', outputFolder: 'playwright-report' }],
@@ -53,7 +50,6 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-      testIgnore: ciSkips,
     },
     {
       name: 'firefox',

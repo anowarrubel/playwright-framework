@@ -8,6 +8,12 @@ performance, responsive, API, visual, i18n and broken-link checks run against th
 demo sites (DemoQA, Academy Bugs, Sauce Demo), and GitHub Actions can run any
 combination on demand.
 
+The three sites are public practice apps with deliberate defects, so the known-issue
+lists below are long on purpose and each entry says why. They also have one host
+each: dev, qa and prod all resolve to the same URL until you set
+`<SITE>_<ENV>_URL`, so the environment switch is wired up but these sites can't show
+a difference between environments.
+
 ## Setup
 
 Needs Node 20+ and npm.
@@ -100,10 +106,10 @@ Create or refresh them, look at the images, then commit:
 npm run t -- saucedemo visual --update
 ```
 
-Baselines are named per OS (`...-chromium-darwin.png`), so CI needs its own.
-Run the workflow with suite `visual` and `update_snapshots` ticked, download the
-`visual-baselines-*` artifact and commit it. Until then CI skips visual tests on
-automatic runs.
+Baselines are named per OS (`...-chromium-darwin.png` locally, `...-chromium-linux.png`
+in CI). To refresh the Linux ones, run the workflow with suite `visual` and
+`update_snapshots` ticked, download the `visual-baselines-chromium` artifact, look at
+the images and commit them.
 
 ### Reports
 
